@@ -1,0 +1,60 @@
+{
+  "intents": [
+    {
+      "tag": "greeting",
+      "patterns": ["Hi", "Hello", "Hey"],
+      "responses": [
+        "Hello! I am the FEEDILINK assistant. How can I help you today?"
+      ]
+    },
+    {
+      "tag": "who_are_you",
+      "patterns": ["Who are you?", "What are you?", "Tell me about yourself"],
+      "responses": [
+        "I am the FEEDILINK chatbot. I help donors, volunteers, and NGOs with food donation-related information."
+      ]
+    },
+    {
+      "tag": "about_feedilink",
+      "patterns": ["What is FEEDILINK?", "Explain FEEDILINK", "About FEEDILINK"],
+      "responses": [
+        "FEEDILINK is a food donation platform that connects donors, volunteers, and NGOs to reduce food wastage and help people in need."
+      ]
+    },
+    {
+      "tag": "food_collection",
+      "patterns": ["Who collects the food?", "How is food delivered?", "Food pickup process"],
+      "responses": [
+        "Volunteers collect the donated food from donors and deliver it to NGOs."
+      ]
+    },
+    {
+      "tag": "food_rules",
+      "patterns": ["What food can be donated?", "Food rules", "Donation guidelines"],
+      "responses": [
+        "Only fresh and edible food is allowed to be donated."
+      ]
+    },
+    {
+      "tag": "time_limit",
+      "patterns": ["Time limit for donation?", "How old can food be?", "Food donation time"],
+      "responses": [
+        "Food must be donated within 4 hours of cooking."
+      ]
+    },
+    {
+      "tag": "donor_rewards",
+      "patterns": ["Do donors get rewards?", "Any benefits for donors?", "Reward points"],
+      "responses": [
+        "Donors receive reward points after a successful donation."
+      ]
+    },
+    {
+      "tag": "chatbot_accuracy",
+      "patterns": ["How does the chatbot work?", "Is the chatbot accurate?", "What is RAG?"],
+      "responses": [
+        "The chatbot uses Retrieval-Augmented Generation (RAG) to reduce hallucinations and provide accurate answers."
+      ]
+    }
+  ]
+}
