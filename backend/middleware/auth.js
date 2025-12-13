@@ -36,4 +36,3 @@ const authorize = (...roles) => {
 
 module.exports = { authenticate, authorize, JWT_SECRET };
 
-

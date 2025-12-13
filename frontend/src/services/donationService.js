@@ -20,11 +20,6 @@ export const getVolunteerDonations = async () => {
   return response.data;
 };
 
-export const getVolunteerHistory = async () => {
-  const response = await api.get('/donations/volunteer');
-  return response.data;
-};
-
 export const assignDonation = async (donationId) => {
   const response = await api.post('/donations/assign', { donation_id: donationId });
   return response.data;

@@ -1,28 +1,34 @@
-import { useState, useEffect } from 'react';
-import { useNavigate, Link, useSearchParams } from 'react-router-dom';
+import { useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
 import { register } from '../services/authService';
+import LocationPicker from '../components/LocationPicker';
 import '../styles/Auth.css';
 
 const Register = () => {
-  const [searchParams] = useSearchParams();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     password: '',
-    role: searchParams.get('role') || 'donor',
+    role: 'donor',
     phone: '',
-    address: ''
+    address: '',
+    city: '',
+    latitude: '',
+    longitude: ''
   });
-
-  useEffect(() => {
-    const roleParam = searchParams.get('role');
-    if (roleParam && ['donor', 'volunteer', 'ngo', 'admin'].includes(roleParam)) {
-      setFormData(prev => ({ ...prev, role: roleParam }));
-    }
-  }, [searchParams]);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+
+  // Handle location change from LocationPicker
+  const handleLocationChange = (location) => {
+    setFormData({
+      ...formData,
+      city: location.city,
+      latitude: location.latitude.toString(),
+      longitude: location.longitude.toString()
+    });
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -114,7 +120,13 @@ const Register = () => {
               onChange={(e) => setFormData({ ...formData, address: e.target.value })}
             />
           </div>
-          <button type="submit" className="btn-primary" disabled={loading}>
+          <LocationPicker
+            value={{ city: formData.city, latitude: formData.latitude, longitude: formData.longitude }}
+            onChange={handleLocationChange}
+            required={true}
+            disabled={loading}
+          />
+          <button type="submit" className="btn-primary" disabled={loading || !formData.city}>
             {loading ? 'Registering...' : 'Register'}
           </button>
         </form>
@@ -127,5 +139,4 @@ const Register = () => {
 };
 
 export default Register;
-
 

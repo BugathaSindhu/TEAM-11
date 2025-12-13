@@ -17,20 +17,67 @@ const Donate = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
+  // Structured location options (can be expanded or loaded from backend)
+  const locationOptions = [
+    'Downtown Area',
+    'Suburban District',
+    'Industrial Zone',
+    'Residential Area',
+    'Commercial District',
+    'University Campus',
+    'Hospital Area',
+    'Airport Zone'
+  ];
+
+  const handleImageUrlChange = (e) => {
+    const url = e.target.value.trim();
+    setFormData({ ...formData, image_url: url });
+    
+    // Validate URL format
+    if (url && !url.startsWith('http://') && !url.startsWith('https://')) {
+      setError('Image URL must start with http:// or https://');
+    } else {
+      setError('');
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setSuccess('');
+    
+    // Validate image URL
+    if (!formData.image_url) {
+      setError('Please provide an image URL for AI safety validation');
+      return;
+    }
+    
+    // Validate URL format
+    if (!formData.image_url.startsWith('http://') && !formData.image_url.startsWith('https://')) {
+      setError('Image URL must start with http:// or https://');
+      return;
+    }
+
     setLoading(true);
 
     try {
-      await createDonation(formData);
-      setSuccess('Donation created successfully!');
+      const response = await createDonation(formData);
+      
+      // Check if donation was rejected by AI
+      if (response.rejected) {
+        setError(`Donation rejected: ${response.reason || 'Food safety validation failed'}`);
+        return;
+      }
+      
+      setSuccess('Donation created successfully and assigned by AI!');
       setTimeout(() => {
         navigate('/donor/dashboard');
-      }, 1500);
+      }, 2000);
     } catch (err) {
-      setError(err.response?.data?.error || 'Failed to create donation');
+      const errorMessage = err.response?.data?.error || 
+                          err.response?.data?.message || 
+                          'Failed to create donation';
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -73,13 +120,42 @@ const Donate = () => {
             />
           </div>
           <div className="form-group">
-            <label>Pickup Address</label>
-            <input
-              type="text"
+            <label>Pickup Location</label>
+            <select
               value={formData.pickup_address}
               onChange={(e) => setFormData({ ...formData, pickup_address: e.target.value })}
               required
+            >
+              <option value="">Select pickup location</option>
+              {locationOptions.map((location) => (
+                <option key={location} value={location}>
+                  {location}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="form-group">
+            <label>Food Image URL (Required for AI Validation)</label>
+            <input
+              type="url"
+              value={formData.image_url}
+              onChange={handleImageUrlChange}
+              placeholder="https://example.com/food.jpg"
+              required
             />
+            {formData.image_url && (
+              <div style={{ marginTop: '10px' }}>
+                <img 
+                  src={formData.image_url} 
+                  alt="Food preview" 
+                  style={{ maxWidth: '200px', maxHeight: '200px', borderRadius: '4px' }}
+                  onError={() => setError('Failed to load image from URL')}
+                />
+              </div>
+            )}
+            <small style={{ display: 'block', marginTop: '5px', color: '#666' }}>
+              Enter a publicly accessible image URL (http:// or https://). AI will validate food safety.
+            </small>
           </div>
           <div className="form-group">
             <label>Expiry Time</label>
@@ -90,17 +166,8 @@ const Donate = () => {
               required
             />
           </div>
-          <div className="form-group">
-            <label>Image URL (Optional)</label>
-            <input
-              type="text"
-              value={formData.image_url}
-              onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
-              placeholder="Enter image filename"
-            />
-          </div>
           <button type="submit" className="btn-primary" disabled={loading}>
-            {loading ? 'Creating...' : 'Create Donation'}
+            {loading ? 'Processing with AI...' : 'Create Donation'}
           </button>
         </form>
         <button onClick={() => navigate('/donor/dashboard')} className="btn-secondary">
@@ -112,5 +179,4 @@ const Donate = () => {
 };
 
 export default Donate;
-
 

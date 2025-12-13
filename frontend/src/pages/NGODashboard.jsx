@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { getNearbyDonations } from '../services/donationService';
 import { logout, getCurrentUser } from '../services/authService';
 import '../styles/Dashboard.css';
@@ -37,9 +37,6 @@ const NGODashboard = () => {
           <h1>FEEDILINK - NGO Dashboard</h1>
           <div className="nav-actions">
             <span>Welcome, {user?.name}</span>
-            <Link to="/ngo/requests" className="btn-secondary">Requests</Link>
-            <Link to="/ngo/history" className="btn-secondary">History</Link>
-            <Link to="/ngo/profile" className="btn-secondary">Profile</Link>
             <button onClick={handleLogout} className="btn-secondary">Logout</button>
           </div>
         </div>
@@ -89,5 +86,4 @@ const NGODashboard = () => {
 };
 
 export default NGODashboard;
-
 

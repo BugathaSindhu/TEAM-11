@@ -34,7 +34,6 @@ const DonorDashboard = () => {
     const badges = {
       pending: 'badge-pending',
       assigned: 'badge-assigned',
-      picked: 'badge-assigned',
       delivered: 'badge-delivered'
     };
     return badges[status] || '';
@@ -47,9 +46,6 @@ const DonorDashboard = () => {
           <h1>FEEDILINK - Donor Dashboard</h1>
           <div className="nav-actions">
             <span>Welcome, {user?.name}</span>
-            <Link to="/donor/my-donations" className="btn-secondary">My Donations</Link>
-            <Link to="/donor/rewards" className="btn-secondary">Rewards</Link>
-            <Link to="/donor/profile" className="btn-secondary">Profile</Link>
             <Link to="/donor/donate" className="btn-primary">Create Donation</Link>
             <button onClick={handleLogout} className="btn-secondary">Logout</button>
           </div>
@@ -104,5 +100,4 @@ const DonorDashboard = () => {
 };
 
 export default DonorDashboard;
-
 

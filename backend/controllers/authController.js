@@ -1,6 +1,7 @@
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 const { JWT_SECRET } = require('../middleware/auth');
+const { normalizeLocation, validateLocation } = require('../utils/locationNormalizer');
 
 const generateToken = (user) => {
   return jwt.sign(
@@ -12,7 +13,7 @@ const generateToken = (user) => {
 
 const register = async (req, res) => {
   try {
-    const { name, email, password, role, phone, address } = req.body;
+    const { name, email, password, role, phone, address, latitude, longitude, city } = req.body;
 
     if (!name || !email || !password || !role) {
       return res.status(400).json({ error: 'Missing required fields' });
@@ -22,12 +23,33 @@ const register = async (req, res) => {
       return res.status(400).json({ error: 'Invalid role' });
     }
 
+    // Normalize location data (required for all roles)
+    let normalizedLocation;
+    try {
+      normalizedLocation = normalizeLocation({ latitude, longitude, city });
+      validateLocation(normalizedLocation);
+    } catch (locationError) {
+      return res.status(400).json({ 
+        error: `Location error: ${locationError.message}` 
+      });
+    }
+
     const existingUser = await User.findByEmail(email);
     if (existingUser) {
       return res.status(400).json({ error: 'Email already registered' });
     }
 
-    const user = await User.create({ name, email, password, role, phone, address });
+    const user = await User.create({ 
+      name, 
+      email, 
+      password, 
+      role, 
+      phone, 
+      address, 
+      latitude: normalizedLocation.latitude, 
+      longitude: normalizedLocation.longitude, 
+      city: normalizedLocation.city 
+    });
     const token = generateToken(user);
 
     res.status(201).json({
@@ -83,51 +105,46 @@ const getMe = async (req, res) => {
   }
 };
 
-const forgotPassword = async (req, res) => {
-  try {
-    const { email } = req.body;
-
-    if (!email) {
-      return res.status(400).json({ error: 'Email required' });
-    }
-
-    const user = await User.findByEmail(email);
-    if (!user) {
-      // For security, don't reveal if email exists
-      return res.json({ message: 'If email exists, reset instructions will be sent' });
-    }
-
-    // Mock: In production, send email with reset token
-    console.log(`Password reset requested for: ${email}`);
-    console.log(`Mock: Reset token would be sent to ${email}`);
-
-    res.json({ message: 'If email exists, reset instructions will be sent' });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
-
 const updateProfile = async (req, res) => {
   try {
-    const { name, phone, address } = req.body;
+    const { name, phone, address, latitude, longitude, city } = req.body;
+    const userId = req.user.userId;
 
-    if (!name) {
-      return res.status(400).json({ error: 'Name is required' });
+    // If location data is provided, normalize and validate it
+    if (latitude !== undefined || longitude !== undefined || city !== undefined) {
+      let normalizedLocation;
+      try {
+        normalizedLocation = normalizeLocation({ latitude, longitude, city });
+        validateLocation(normalizedLocation);
+      } catch (locationError) {
+        return res.status(400).json({ 
+          error: `Location error: ${locationError.message}` 
+        });
+      }
+
+      // Update with normalized location data
+      await User.update(userId, {
+        name,
+        phone,
+        address,
+        latitude: normalizedLocation.latitude,
+        longitude: normalizedLocation.longitude,
+        city: normalizedLocation.city
+      });
+    } else {
+      // Update without location data
+      await User.update(userId, { name, phone, address });
     }
 
-    const result = await User.update(req.user.userId, { name, phone, address });
-
-    if (result.changes === 0) {
-      return res.status(404).json({ error: 'User not found' });
-    }
-
-    const updatedUser = await User.findById(req.user.userId);
-    res.json({ message: 'Profile updated successfully', user: updatedUser });
+    const updatedUser = await User.findById(userId);
+    res.json({
+      message: 'Profile updated successfully',
+      user: updatedUser
+    });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
 
-module.exports = { register, login, getMe, forgotPassword, updateProfile };
-
+module.exports = { register, login, getMe, updateProfile };
 

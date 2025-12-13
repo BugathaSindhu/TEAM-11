@@ -2,16 +2,16 @@ const db = require('../config/database');
 
 class Donation {
   static async create(donationData) {
-    const { donor_id, food_name, food_type, quantity, pickup_address, expiry_time, image_url } = donationData;
+    const { donor_id, food_name, food_type, quantity, pickup_address, expiry_time, volunteer_id, ngo_id } = donationData;
 
     return new Promise((resolve, reject) => {
       db.run(
-        `INSERT INTO donations (donor_id, food_name, food_type, quantity, pickup_address, expiry_time, image_url) 
-         VALUES (?, ?, ?, ?, ?, ?, ?)`,
-        [donor_id, food_name, food_type, quantity, pickup_address, expiry_time, image_url || null],
+        `INSERT INTO donations (donor_id, food_name, food_type, quantity, pickup_address, expiry_time, volunteer_id, status) 
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+        [donor_id, food_name, food_type, quantity, pickup_address, expiry_time, volunteer_id || null, volunteer_id ? 'assigned' : 'pending'],
         function(err) {
           if (err) reject(err);
-          else resolve({ id: this.lastID, ...donationData, status: 'pending' });
+          else resolve({ id: this.lastID, ...donationData, status: volunteer_id ? 'assigned' : 'pending' });
         }
       );
     });
@@ -59,23 +59,10 @@ class Donation {
     });
   }
 
-  static async markPicked(donationId, volunteerId) {
-    return new Promise((resolve, reject) => {
-      db.run(
-        `UPDATE donations SET status = 'picked' WHERE id = ? AND volunteer_id = ? AND status = 'assigned'`,
-        [donationId, volunteerId],
-        function(err) {
-          if (err) reject(err);
-          else resolve({ changes: this.changes });
-        }
-      );
-    });
-  }
-
   static async complete(donationId, volunteerId) {
     return new Promise((resolve, reject) => {
       db.run(
-        `UPDATE donations SET status = 'delivered' WHERE id = ? AND volunteer_id = ? AND status IN ('assigned', 'picked')`,
+        `UPDATE donations SET status = 'delivered' WHERE id = ? AND volunteer_id = ? AND status = 'assigned'`,
         [donationId, volunteerId],
         function(err) {
           if (err) reject(err);
@@ -126,7 +113,7 @@ class Donation {
         `SELECT d.*, u.name as donor_name, u.phone as donor_phone 
          FROM donations d 
          JOIN users u ON d.donor_id = u.id 
-         WHERE d.volunteer_id = ? AND d.status IN ('assigned', 'picked', 'delivered')
+         WHERE d.volunteer_id = ? AND d.status IN ('assigned', 'delivered')
          ORDER BY d.created_at DESC`,
         [volunteerId],
         (err, rows) => {

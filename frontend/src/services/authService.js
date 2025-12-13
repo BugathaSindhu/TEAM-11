@@ -38,13 +38,7 @@ export const getMe = async () => {
 };
 
 export const updateProfile = async (profileData) => {
-  const response = await api.put('/auth/profile', profileData);
+  const response = await api.put('/auth/profile/update', profileData);
   return response.data;
 };
-
-export const forgotPassword = async (email) => {
-  const response = await api.post('/auth/forgot-password', { email });
-  return response.data;
-};
-
 

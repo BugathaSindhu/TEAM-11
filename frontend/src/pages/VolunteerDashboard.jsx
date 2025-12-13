@@ -63,9 +63,6 @@ const VolunteerDashboard = () => {
           <h1>FEEDILINK - Volunteer Dashboard</h1>
           <div className="nav-actions">
             <span>Welcome, {user?.name}</span>
-            <Link to="/volunteer/tasks" className="btn-secondary">Tasks</Link>
-            <Link to="/volunteer/history" className="btn-secondary">History</Link>
-            <Link to="/volunteer/profile" className="btn-secondary">Profile</Link>
             <button onClick={handleLogout} className="btn-secondary">Logout</button>
           </div>
         </div>

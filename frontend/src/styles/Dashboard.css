@@ -141,21 +141,6 @@
   color: #721c24;
 }
 
-.badge-low {
-  background-color: #d1e7dd;
-  color: #0f5132;
-}
-
-.badge-medium {
-  background-color: #fff3cd;
-  color: #856404;
-}
-
-.badge-high {
-  background-color: #f8d7da;
-  color: #721c24;
-}
-
 .empty-state {
   background-color: white;
   padding: 40px;
@@ -178,5 +163,4 @@
 .empty-state a:hover {
   text-decoration: underline;
 }
-
 

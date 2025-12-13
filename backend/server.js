@@ -6,9 +6,7 @@ const authRoutes = require('./routes/authRoutes');
 const donationRoutes = require('./routes/donationRoutes');
 const ngoRoutes = require('./routes/ngoRoutes');
 const adminRoutes = require('./routes/adminRoutes');
-const contactRoutes = require('./routes/contactRoutes');
-const rewardsRoutes = require('./routes/rewardsRoutes');
-const volunteerRoutes = require('./routes/volunteerRoutes');
+const userRoutes = require('./routes/userRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -23,9 +21,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/donations', donationRoutes);
 app.use('/api/ngo', ngoRoutes);
 app.use('/api/admin', adminRoutes);
-app.use('/api/contact', contactRoutes);
-app.use('/api/rewards', rewardsRoutes);
-app.use('/api/volunteer', volunteerRoutes);
+app.use('/api/users', userRoutes); // For AI service to fetch volunteers/NGOs
 
 // Health check
 app.get('/api/health', (req, res) => {

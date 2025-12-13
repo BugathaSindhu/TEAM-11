@@ -8,10 +8,6 @@ const Landing = () => {
         <div className="container">
           <h1 className="logo">FEEDILINK</h1>
           <div className="nav-links">
-            <Link to="/about">About</Link>
-            <Link to="/how-it-works">How It Works</Link>
-            <Link to="/impact">Impact</Link>
-            <Link to="/contact">Contact</Link>
             <Link to="/login">Login</Link>
             <Link to="/register" className="btn-primary">Register</Link>
           </div>
@@ -53,5 +49,4 @@ const Landing = () => {
 };
 
 export default Landing;
-
 

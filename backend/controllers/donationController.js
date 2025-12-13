@@ -1,13 +1,90 @@
 const Donation = require('../models/Donation');
+const axios = require('axios');
+
+// AI Service URL - load from environment variable
+const AI_SERVICE_URL = process.env.AI_SERVICE_URL || 'http://localhost:8000';
+
+/**
+ * Call AI orchestration service
+ * This is the integration point with the Python AI service
+ */
+const callAIService = async (donationData) => {
+  try {
+    const response = await axios.post(
+      `${AI_SERVICE_URL}/ai/orchestrate/donation`,
+      donationData,
+      {
+        headers: { 'Content-Type': 'application/json' },
+        timeout: 60000 // 60 second timeout for AI processing
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error('AI Service error:', error.message);
+    if (error.response) {
+      throw new Error(`AI Service error: ${error.response.data.message || error.response.statusText}`);
+    }
+    throw new Error(`AI Service unavailable: ${error.message}`);
+  }
+};
 
 const createDonation = async (req, res) => {
   try {
     const { food_name, food_type, quantity, pickup_address, expiry_time, image_url } = req.body;
 
-    if (!food_name || !food_type || !quantity || !pickup_address || !expiry_time) {
-      return res.status(400).json({ error: 'Missing required fields' });
+    // Validate required fields (image_url is now required)
+    if (!food_name || !food_type || !quantity || !pickup_address || !expiry_time || !image_url) {
+      return res.status(400).json({ 
+        error: 'Missing required fields. Image URL is required for AI validation.' 
+      });
     }
 
+    // Validate image URL format
+    if (!image_url.startsWith('http://') && !image_url.startsWith('https://')) {
+      return res.status(400).json({ 
+        error: 'Image URL must start with http:// or https://' 
+      });
+    }
+
+    // Prepare donation data for AI service
+    const donationDataForAI = {
+      donor_id: req.user.userId,
+      food_name,
+      food_type,
+      quantity,
+      pickup_address,
+      expiry_time,
+      image_url // Image URL
+    };
+
+    // Call AI orchestration service
+    // IMPORTANT: Donation is NOT finalized until AI validates it
+    const aiResult = await callAIService(donationDataForAI);
+
+    // Check if food was rejected by AI
+    if (aiResult.rejected) {
+      return res.status(200).json({
+        success: false,
+        rejected: true,
+        message: 'Donation rejected by AI safety validation',
+        reason: aiResult.summary?.reason || 'Food safety validation failed',
+        confidence: aiResult.summary?.confidence || 0.0,
+        ai_result: aiResult
+      });
+    }
+
+    // Check if AI service returned an error
+    if (aiResult.error || !aiResult.success) {
+      return res.status(500).json({
+        success: false,
+        error: true,
+        message: 'AI service error during donation processing',
+        ai_result: aiResult
+      });
+    }
+
+    // AI validation passed - create donation in database
+    // Include AI-assigned volunteer and NGO if available
     const donation = await Donation.create({
       donor_id: req.user.userId,
       food_name,
@@ -15,11 +92,25 @@ const createDonation = async (req, res) => {
       quantity,
       pickup_address,
       expiry_time,
-      image_url
+      // Store AI results in metadata (you may want to add an ai_metadata column)
+      volunteer_id: aiResult.summary?.volunteer_id || null,
+      ngo_id: aiResult.summary?.ngo_id || null
     });
 
-    res.status(201).json({ message: 'Donation created successfully', donation });
+    // Return success with AI results
+    res.status(201).json({ 
+      message: 'Donation created successfully and assigned by AI',
+      donation,
+      ai_result: {
+        ticket_id: aiResult.summary?.ticket_id,
+        volunteer_id: aiResult.summary?.volunteer_id,
+        ngo_id: aiResult.summary?.ngo_id,
+        priority_score: aiResult.summary?.priority_score,
+        rewards: aiResult.results?.rewards
+      }
+    });
   } catch (error) {
+    console.error('Create donation error:', error);
     res.status(500).json({ error: error.message });
   }
 };

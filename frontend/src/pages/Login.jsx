@@ -66,7 +66,7 @@ const Login = () => {
           </button>
         </form>
         <p className="auth-link">
-          <Link to="/forgot-password">Forgot password?</Link> | <Link to="/register">Register here</Link>
+          Don't have an account? <Link to="/register">Register here</Link>
         </p>
       </div>
     </div>
@@ -74,5 +74,4 @@ const Login = () => {
 };
 
 export default Login;
-
 

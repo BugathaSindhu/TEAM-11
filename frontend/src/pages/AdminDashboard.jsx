@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { getAllUsers, getAllDonations } from '../services/adminService';
 import { logout, getCurrentUser } from '../services/authService';
 import '../styles/Dashboard.css';
@@ -43,9 +43,6 @@ const AdminDashboard = () => {
           <h1>FEEDILINK - Admin Dashboard</h1>
           <div className="nav-actions">
             <span>Welcome, {user?.name}</span>
-            <Link to="/admin/users" className="btn-secondary">Users</Link>
-            <Link to="/admin/donations" className="btn-secondary">Donations</Link>
-            <Link to="/admin/reports" className="btn-secondary">Reports</Link>
             <button onClick={handleLogout} className="btn-secondary">Logout</button>
           </div>
         </div>
@@ -138,5 +135,4 @@ const AdminDashboard = () => {
 };
 
 export default AdminDashboard;
-
 
