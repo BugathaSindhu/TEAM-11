@@ -1,167 +1,87 @@
-# FEEDILINK - Phase 1
+# MealMitra — AI-Powered Food Rescue Platform
 
-A full-stack web application connecting food donors with volunteers to reduce food waste.
+## Problem Statement
 
-## Tech Stack
+Every day, large amounts of *perfectly edible food are wasted* by restaurants, events, and households, while *millions of people lack access to regular meals*.
 
-- **Frontend**: React (Vite), Plain CSS
-- **Backend**: Node.js + Express
-- **AI Service**: Python + Flask (Multi-agent orchestration)
-- **Database**: SQLite
-- **Authentication**: JWT
-- **AI Models**: HuggingFace (Vision + LLM)
+This gap exists due to the absence of:
 
-## Project Structure
+- Real-time coordination between food donors and NGOs  
+- Quick and reliable food safety verification  
+- Intelligent decision-making for matching donors, NGOs, and volunteers  
+- Data-driven insights into food wastage and hunger hotspots  
 
-```
-feediLink/
-├── frontend/
-│   ├── src/
-│   │   ├── pages/
-│   │   ├── components/
-│   │   ├── services/
-│   │   ├── styles/
-│   │   └── App.jsx
-│   ├── package.json
-│   └── vite.config.js
-├── backend/
-│   ├── controllers/
-│   ├── routes/
-│   ├── models/
-│   ├── middleware/
-│   ├── config/
-│   ├── server.js
-│   └── package.json
-├── ai-service/
-│   ├── agents/
-│   ├── orchestrator/
-│   ├── services/
-│   ├── app.py
-│   ├── config.py
-│   └── requirements.txt
-└── README.md
-```
+Manual systems cannot scale or respond fast enough.
 
-## System Roles
+*MealMitra solves this problem using multiple AI agents that autonomously analyze, decide, and optimize food rescue operations in real time.*
 
-- **donor**: Create food donations
-- **volunteer**: Assign and complete donations
-- **ngo**: View delivered donations
-- **admin**: Manage users and donations
+## Data Link
 
-## Setup Instructions
+| Data Type | Source |
+|---------|--------|
+| Food Images | Uploaded by donors and restaurant partners |
+| Location Data | User-provided GPS coordinates |
+| NGO & Volunteer Data | Platform registrations |
+| Traffic & ETA Data | Simulated (extensible to Maps APIs) |
+| Hunger & Demand Data | Placeholder (future government/open datasets) |
+| Interaction Data | User chats, donation history, agent decisions |
 
-### Backend Setup
+All data is securely stored.  
+Food images are private and *never exposed publicly*.
 
-1. Navigate to backend directory:
-```bash
-cd backend
-```
+## System Design (with AI Agents)
 
-2. Install dependencies:
-```bash
-npm install
-```
+MealMitra follows a *microservices-based architecture* powered by *specialized AI agents*, each responsible for a focused task.
 
-3. Create `.env` file (optional):
-```
-PORT=5000
-JWT_SECRET=your_secret_key_here
-```
+### AI Agents
 
-4. Start the server:
-```bash
-npm start
-# or for development with auto-reload:
-npm run dev
-```
+#### 1. Vision Analysis Agent
+- Analyzes uploaded food images  
+- Determines food safety, food type, quantity, and expiry estimate  
 
-The backend will run on `http://localhost:5000`
+#### 2. Matching & Optimization Agent
+- Selects the best NGO and volunteer  
+- Considers distance, food type, quantity, and estimated pickup time  
 
-### Frontend Setup
+#### 3. Heatmap Intelligence Agent
+- Aggregates donation and demand data  
+- Identifies hunger hotspots and food-waste clusters  
 
-1. Navigate to frontend directory:
-```bash
-cd frontend
-```
+#### 4. Sustainability Impact Agent
+- Calculates meals saved  
+- Estimates carbon footprint reduction  
 
-2. Install dependencies:
-```bash
-npm install
-```
+#### 5. Conversational Assistant Agent
+- Guides donors, NGOs, and volunteers  
+- Explains workflows and answers queries using Generative AI and RAG  
 
-3. Start the development server:
-```bash
-npm run dev
-```
+## Architecture Flow
 
-The frontend will run on `http://localhost:3000`
+Frontend (React)
+↓
+Backend API (Node.js + Express)
+↓
+AI Agents (FastAPI Microservices)
+↓
+MySQL 
 
-## API Endpoints
+## Assumptions
 
-### Authentication
-- `POST /api/auth/register` - Register new user
-- `POST /api/auth/login` - Login user
-- `GET /api/auth/me` - Get current user (protected)
+- AI agent outputs are *advisory*, with final decisions made by NGOs or administrators  
+- Vision agent accuracy depends on image quality  
+- Traffic and ETA inputs are approximations in development  
+- Email and push notifications are simulated locally  
+- AI agents operate within ethical and privacy constraints  
+- Uploaded food images are *never returned in API responses*  
 
-### Donations
-- `POST /api/donations/create` - Create donation (donor only)
-- `GET /api/donations/donor/:id` - Get donor's donations (donor only)
-- `GET /api/donations/available` - Get available donations (volunteer only)
-- `POST /api/donations/assign` - Assign donation (volunteer only)
-- `POST /api/donations/complete` - Complete donation (volunteer only)
-- `GET /api/donations/nearby-donations` - Get nearby donations (NGO only)
+## Impact
 
-### Admin
-- `GET /api/admin/users` - Get all users (admin only)
-- `GET /api/admin/donations` - Get all donations (admin only)
+MealMitra aims to:
+- Reduce food waste  
+- Improve food distribution efficiency  
+- Support NGOs and volunteers with AI-driven decisions  
+- Promote sustainability and social good  
 
-## Default Admin Account
-
-You can register an admin account through the registration page by selecting "Admin" as the role.
-
-## Features
-
-- User authentication with JWT
-- Role-based access control
-- Donation management
-- Volunteer assignment system
-- NGO donation viewing
-- Admin dashboard for user and donation management
-
-## AI Service Setup
-
-The platform now includes an AI orchestration service for intelligent donation processing:
-
-1. **Navigate to AI service:**
-```bash
-cd ai-service
-```
-
-2. **Install Python dependencies:**
-```bash
-pip install -r requirements.txt
-```
-
-3. **Configure environment:**
-Create `.env` file with your HuggingFace API key:
-```
-HF_API_KEY=your_key_here
-NODE_BACKEND_URL=http://localhost:5000
-```
-
-4. **Start AI service:**
-```bash
-python app.py
-```
-
-See `ai-service/README.md` and `INTEGRATION_GUIDE.md` for detailed documentation.
-
-## Notes
-
-- Database (SQLite) is automatically created on first run
-- JWT tokens are stored in localStorage
-- All routes are protected based on user roles
-- AI service provides food safety validation and intelligent assignment
-- Donations require image upload for AI validation
-
+## Conclusion
+MealMitra demonstrates how *AI agents and full-stack engineering* can be combined to address real-world social challenges.  
+By transforming surplus food into actionable intelligence, the platform helps ensure that *no good food goes to waste while people go hungry*.
